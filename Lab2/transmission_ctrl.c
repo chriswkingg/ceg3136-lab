@@ -9,42 +9,80 @@ void transmission_ctrl_init(transmission_ctrl_t *ctrl){
   ctrl->GRD[3] = 1;  // gear ratio differential
   ctrl->GRD[4] = 0.84;  // gear ratio differential
   ctrl->CT = 1.613679;  // wheal circumference in meters
+	ctrl->minSpeed[0] = 999;
+	ctrl->minSpeed[1] = 999;
+	ctrl->minSpeed[2] = 999;
+	ctrl->minSpeed[3] = 999;
+	ctrl->minSpeed[4] = 999;
+	ctrl->minRPM[0] = 99999;
+	ctrl->minRPM[1] = 99999;
+	ctrl->minRPM[2] = 99999;
+	ctrl->minRPM[3] = 99999;
+	ctrl->minRPM[4] = 99999;
 }
 void transmission_ctrl_update_state(transmission_ctrl_t *ctrl){
-  int rpm = ((*(ctrl->speed) * ctrl->GRT * ctrl->GRD[ctrl->gear]) / (ctrl->CT * 3.6)*60);
+  int rpm = speed_2_rpm(*ctrl->speed, ctrl->GRD[ctrl->gear]);
 	int gear = (int)ctrl->gear;
 	*(ctrl->rpm) = rpm;
+	
+	if(*ctrl->rpm > ctrl->maxRPM[ctrl->gear]) {
+		ctrl->maxRPM[ctrl->gear] = *ctrl->rpm;
+	}  
+	if (*ctrl->rpm < ctrl->minRPM[ctrl->gear]) {
+		ctrl->minRPM[ctrl->gear] = *ctrl->rpm;
+	} 
+	
+	if (*ctrl->speed > ctrl->maxSpeed[ctrl->gear]) {
+		ctrl->maxSpeed[ctrl->gear] = *ctrl->speed;
+	}  
+	if (*ctrl->speed < ctrl->minSpeed[ctrl->gear]) {
+		ctrl->minSpeed[ctrl->gear] = *ctrl->speed;
+	}
+	
 	switch(ctrl->gear) {
 		case FIRST_GEAR:
 			if(*(ctrl->rpm) >= 2500) {
+				ctrl->upShifts[ctrl->gear]++;
 				ctrl->gear = SECOND_GEAR;
 			}
 			break;			
 		case SECOND_GEAR:
 			if(*(ctrl->rpm) >= 2500) {
+				ctrl->upShifts[ctrl->gear]++;
 				ctrl->gear = THIRD_GEAR;
+
 			} else if (*(ctrl->rpm) <= 700) {
-					ctrl->gear = FIRST_GEAR;
+				ctrl->downShifts[ctrl->gear]++;	
+				ctrl->gear = FIRST_GEAR;
+				
 			}
 			break;
 		case THIRD_GEAR:
 			if(*(ctrl->rpm) >= 2500) {
+				ctrl->upShifts[ctrl->gear]++;
 				ctrl->gear = FOURTH_GEAR;
+				
 			} else if (*(ctrl->rpm) <= 700) {
+				ctrl->downShifts[ctrl->gear]++;
 					ctrl->gear = SECOND_GEAR;
+				
 
 			}
 			break;			
 		case FOURTH_GEAR: 
 			if(*(ctrl->rpm) >= 2500) {
+				ctrl->upShifts[ctrl->gear]++;
 				ctrl->gear = FIFTH_GEAR;
 			
 			} else if (*(ctrl->rpm) <= 700) {
+				ctrl->downShifts[ctrl->gear]++;
 					ctrl->gear = THIRD_GEAR;
+			
 			}
 			break;
 		case FIFTH_GEAR:
 			if(*(ctrl->rpm) <= 2000) {
+				ctrl->downShifts[ctrl->gear]++;
 				ctrl->gear = FOURTH_GEAR;
 			}
 			break;
@@ -58,7 +96,5 @@ uint32_t speed_2_rpm(float grd, float speed){
   _rpm = (uint32_t) (35.32f * speed * grd);
   return _rpm;
 }
-
-
 
 

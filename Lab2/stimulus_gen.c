@@ -6,6 +6,17 @@ void stimulus_init(stimulus_gen_t *stim_gen, uint32_t seed){
   stim_gen->time_step = 0;
   stim_gen->transmission_state = PARKING;
   stim_gen->shaping_param = (seed & 0xFF) / 0xFF; 
+	stim_gen->ctrl->minSpeed[0] = 999;
+	stim_gen->ctrl->minSpeed[1] = 999;
+	stim_gen->ctrl->minSpeed[2] = 999;
+	stim_gen->ctrl->minSpeed[3] = 999;
+	stim_gen->ctrl->minSpeed[4] = 999;
+	stim_gen->ctrl->minRPM[0] = 999;
+	stim_gen->ctrl->minRPM[1] = 999;
+	stim_gen->ctrl->minRPM[2] = 999;
+	stim_gen->ctrl->minRPM[3] = 999;
+	stim_gen->ctrl->minRPM[4] = 999;
+
 }
 void stimulus_update(stimulus_gen_t *stim_gen){
   *stim_gen->rpm = 0;
@@ -74,6 +85,12 @@ void display_status(stimulus_gen_t *stim){
       break;
     case DRIVING:
       printf ("state %s", sub_state_names[stim->ctrl->gear]);
+			printf ("\nupshifts %f %f %f %f %f", stim->ctrl->upShifts[0], stim->ctrl->upShifts[1], stim->ctrl->upShifts[2], stim->ctrl->upShifts[3], stim->ctrl->upShifts[4]);
+			printf ("\ndownshifts %f %f %f %f %f", stim->ctrl->downShifts[0], stim->ctrl->downShifts[1], stim->ctrl->downShifts[2], stim->ctrl->downShifts[3], stim->ctrl->downShifts[4]);
+			printf ("\nminspeed %f %f %f %f %f", stim->ctrl->minSpeed[0], stim->ctrl->minSpeed[1], stim->ctrl->minSpeed[2], stim->ctrl->minSpeed[3], stim->ctrl->minSpeed[4]);
+			printf ("\nmaxspeed %f %f %f %f %f", stim->ctrl->maxSpeed[0], stim->ctrl->maxSpeed[1], stim->ctrl->maxSpeed[2], stim->ctrl->maxSpeed[3], stim->ctrl->maxSpeed[4]);
+			printf ("\nminrpm %d %d %d %d %d", stim->ctrl->minRPM[0], stim->ctrl->minRPM[1], stim->ctrl->minRPM[2], stim->ctrl->minRPM[3], stim->ctrl->minRPM[4]);
+			printf ("\nmaxrpm %d %d %d %d %d", stim->ctrl->maxRPM[0], stim->ctrl->maxRPM[1], stim->ctrl->maxRPM[2], stim->ctrl->maxRPM[3], stim->ctrl->maxRPM[4]);
       break;
   }
   printf ("\n");

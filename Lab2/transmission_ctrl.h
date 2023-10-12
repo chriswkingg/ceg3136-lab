@@ -12,6 +12,12 @@ typedef struct transmission_ctrl_s {
   float           CT;  // wheal circumference in meters
   uint32_t        *rpm;   // revolutions per minute
   driving__gear_e gear;   // current drive gear
+	float upShifts[5];
+	float downShifts[5];
+	float minSpeed[5];
+	float maxSpeed[5];
+	uint32_t minRPM[5];
+	uint32_t maxRPM[5];
 } transmission_ctrl_t;
 
 void transmission_ctrl_update_state(transmission_ctrl_t *ctrl);
